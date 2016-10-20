@@ -19,6 +19,7 @@ class Frontend extends AbstractHandler implements Runnable {
     private static final int refreshTime = 1000;
     private static Logger log = Logger.getLogger("TestLogName");
 
+    // TODO: добавить sessionId !!! Передавать его в странице и получать обратно!
     private static String pagePart0 = "<html>" +
             "<head>" +
             "<script type='text/JavaScript'>" +
