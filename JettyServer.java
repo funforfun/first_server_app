@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class JettyServer extends AbstractHandler
 {
-    private static AtomicInteger at = new AtomicInteger(0);
+
 
     public void handle(String target,
                        Request baseRequest,
@@ -32,10 +32,11 @@ public class JettyServer extends AbstractHandler
             throws IOException, ServletException
     {
 
+//        log.info("New message!");
         response.setContentType("text/html;charset=utf-8");
         response.setStatus(HttpServletResponse.SC_OK);
         baseRequest.setHandled(true);
-        response.getWriter().println(FrontEnd.getPage());
+        response.getWriter().println(Frontend.getPage());
 
 //        response.setContentType("text/html;charset=utf-8");
 //        response.setStatus(HttpServletResponse.SC_OK);
@@ -72,8 +73,15 @@ public class JettyServer extends AbstractHandler
 
     private static void simpleServer() throws Exception, InterruptedException
     {
+        Frontend frontend = new Frontend();
+        Thread thread = new Thread(frontend);
+        thread.start();
+
         Server server = new Server(8080);
-        server.setHandler(new JettyServer());
+//        server.setHandler(new JettyServer());
+//        server.start();
+//        server.join();
+        server.setHandler(frontend);
         server.start();
         server.join();
     }
