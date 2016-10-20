@@ -62,8 +62,10 @@ class Frontend extends AbstractHandler implements Runnable {
     @Override
     public void run() {
         try {
-            Thread.sleep(5000);
-            log.info("" + handleCount);
+            while(true){
+                Thread.sleep(5000);
+                log.info("" + handleCount);
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
