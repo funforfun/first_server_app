@@ -11,16 +11,21 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
-class Frontend extends AbstractHandler implements Runnable {
+class Frontend extends AbstractHandler implements Abonent, Runnable {
 
     private static AtomicInteger handleCount = new AtomicInteger(0);
     private static AtomicInteger lastUserId = new AtomicInteger(0);
     private static final int refreshTime = 3000;
     private static Logger log = Logger.getLogger("TestLogName");
     private final MessageSystem messageSystem;
+
+    private static String GAME_NAME = "/test/";
+    private Map<String, Integer> nameToId = new HashMap<String, Integer>();
 
     // TODO: добавить sessionId !!! Передавать его в странице и получать обратно!
     private static String pagePart0 = "<html>" +
@@ -52,7 +57,7 @@ class Frontend extends AbstractHandler implements Runnable {
             "</html>";
 
 
-    Frontend(MessageSystem messageSystem){
+    Frontend(MessageSystem messageSystem) {
         this.messageSystem = messageSystem;
     }
 
@@ -86,7 +91,7 @@ class Frontend extends AbstractHandler implements Runnable {
         httpServletResponse.setContentType("text/html;charset=utf-8");
         httpServletResponse.setStatus(HttpServletResponse.SC_OK);
         request.setHandled(true);
-        httpServletResponse.getWriter().println(Frontend.getPage());
+//        httpServletResponse.getWriter().println(Frontend.getPage());
 
         /*
          * Вариант через форму:
@@ -95,41 +100,44 @@ class Frontend extends AbstractHandler implements Runnable {
          * }
          */
 
-
-        // TODO: через куки!
-        Cookie[] cookies = httpServletRequest.getCookies();
-
-        if (cookies.length == 0) {
-            Cookie oreo = new Cookie("session_id", "" + lastUserId.getAndIncrement());
-            httpServletResponse.addCookie(oreo);
-            log.info("НОВЫЙ КУК:" + oreo.getValue());
-        } else {
-            log.info("cookies.length:" + cookies.length);
-            for (Cookie el : cookies) {
-                if (el.getName().equals("session_id")) {
-                    log.info("el.getValue():" + el.getValue());
-                }
-            }
+        if (!s.equals(GAME_NAME)) {
+            return;
         }
-//        httpServletRequest.changeSessionId();
-//        log.info("getRequestedSessionId:" + httpServletRequest.getRequestedSessionId());
 
-//        HttpSession session = httpServletRequest.getSession();
+        String name = "Tully";
+        Integer id = nameToId.get(name);
 
-//        httpServletRequest.getSession(true);
-//        HttpSession httpSession = httpServletRequest.getSession(true);
+        if (id != null) {
+            httpServletResponse.getWriter().println("<h1>User name: " + name + " Id:" + id + "</h1>");
+        } else {
+            httpServletResponse.getWriter().println("<h1>Wait for authorization</h1>");
+            Address addressAccountService = messageSystem.getAddressService().getAddress(AccountService.class);
+            messageSystem.sendMessage(new MessageGetUserId(getAddress(), addressAccountService, name));
+        }
+
+
+//        // TODO: через куки!
+//        Cookie[] cookies = httpServletRequest.getCookies();
 //
-//        if (!httpSession.isNew()) {
-//            log.info("Session id:" + httpSession.getId());
+//        if (cookies.length == 0) {
+//            Cookie oreo = new Cookie("session_id", "" + lastUserId.getAndIncrement());
+//            httpServletResponse.addCookie(oreo);
+//            log.info("НОВЫЙ КУК:" + oreo.getValue());
+//        } else {
+//            log.info("cookies.length:" + cookies.length);
+//            for (Cookie el : cookies) {
+//                if (el.getName().equals("session_id")) {
+//                    log.info("el.getValue():" + el.getValue());
+//                }
+//            }
 //        }
+    }
 
+    void setId(String name, Integer id) {
+        // TODO:
+    }
 
-//        request.setSessionManager();
-//        request.setSession();
-//        HttpSession session = request.getSession();
-//        HttpSession session = new HttpSession();
-
-
-//        log.info("Session id:" + session.getId());
+    Address getAddress() {
+        return null;
     }
 }
