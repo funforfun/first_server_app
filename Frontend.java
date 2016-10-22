@@ -4,6 +4,7 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -16,7 +17,8 @@ import java.util.logging.Logger;
 class Frontend extends AbstractHandler implements Runnable {
 
     private static AtomicInteger handleCount = new AtomicInteger(0);
-    private static final int refreshTime = 1000;
+    private static AtomicInteger lastUserId = new AtomicInteger(0);
+    private static final int refreshTime = 3000;
     private static Logger log = Logger.getLogger("TestLogName");
 
     // TODO: добавить sessionId !!! Передавать его в странице и получать обратно!
@@ -63,8 +65,8 @@ class Frontend extends AbstractHandler implements Runnable {
     @Override
     public void run() {
         try {
-            while(true){
-                Thread.sleep(5000);
+            while (true) {
+                Thread.sleep(7000);
                 log.info("" + handleCount);
             }
         } catch (InterruptedException e) {
@@ -74,10 +76,55 @@ class Frontend extends AbstractHandler implements Runnable {
 
     @Override
     public void handle(String s, Request request, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException, ServletException {
+
         handleCount.incrementAndGet();
         httpServletResponse.setContentType("text/html;charset=utf-8");
         httpServletResponse.setStatus(HttpServletResponse.SC_OK);
         request.setHandled(true);
         httpServletResponse.getWriter().println(Frontend.getPage());
+
+        /*
+         * Вариант через форму:
+         * if(request.getMethod().equals("POST")){
+         *  request.getParameter('session_id');
+         * }
+         */
+
+
+        // TODO: через куки!
+        Cookie[] cookies = httpServletRequest.getCookies();
+
+        if (cookies.length == 0) {
+            Cookie oreo = new Cookie("session_id", "" + lastUserId.getAndIncrement());
+            httpServletResponse.addCookie(oreo);
+            log.info("НОВЫЙ КУК:" + oreo.getValue());
+        } else {
+            log.info("cookies.length:" + cookies.length);
+            for (Cookie el : cookies) {
+                if (el.getName().equals("session_id")) {
+                    log.info("el.getValue():" + el.getValue());
+                }
+            }
+        }
+//        httpServletRequest.changeSessionId();
+//        log.info("getRequestedSessionId:" + httpServletRequest.getRequestedSessionId());
+
+//        HttpSession session = httpServletRequest.getSession();
+
+//        httpServletRequest.getSession(true);
+//        HttpSession httpSession = httpServletRequest.getSession(true);
+//
+//        if (!httpSession.isNew()) {
+//            log.info("Session id:" + httpSession.getId());
+//        }
+
+
+//        request.setSessionManager();
+//        request.setSession();
+//        HttpSession session = request.getSession();
+//        HttpSession session = new HttpSession();
+
+
+//        log.info("Session id:" + session.getId());
     }
 }
