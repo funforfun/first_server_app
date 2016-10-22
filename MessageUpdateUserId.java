@@ -1,8 +1,8 @@
 package com.company;
 
 class MessageUpdateUserId extends MessageToFrontend{
-    String name;
-    Integer id;
+    private String name;
+    private Integer id;
 
     MessageUpdateUserId(Address from, Address to, String name, Integer id) {
         super(from, to);

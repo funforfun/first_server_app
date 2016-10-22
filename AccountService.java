@@ -6,7 +6,6 @@ import java.util.Map;
 class AccountService implements Abonent, Runnable {
     private Address address;
     private final MessageSystem messageSystem;
-
     private Map<String, Integer> fakeAccounter = new HashMap<String, Integer>();
 
     AccountService(MessageSystem messageSystem) {
@@ -21,7 +20,7 @@ class AccountService implements Abonent, Runnable {
     public void run() {
         while (true) {
             messageSystem.execForAbonent(this);
-            Thread.sleep(10);
+            ThreadSleepHelper.sleep(10);
         }
 
     }
@@ -35,8 +34,7 @@ class AccountService implements Abonent, Runnable {
         return messageSystem;
     }
 
-    @Override
-    Address getAddress() {
+    public Address getAddress() {
         return address;
     }
 }

@@ -9,7 +9,6 @@ class MessageGetUserId extends MessageToAccountService{
         this.name = name;
     }
 
-    @Override
     void exec(AccountService accountService) {
         Integer id = accountService.getUserId(name);
         accountService.getMessageSystem().sendMessage(new MessageUpdateUserId(getTo(),getFrom(), name, id));

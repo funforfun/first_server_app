@@ -29,7 +29,11 @@ class MessageSystem {
 
         while (!messageQueue.isEmpty()) {
             Message message = messageQueue.poll();
-            message.exec();
+            try {
+                message.exec(abonent);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 

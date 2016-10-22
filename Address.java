@@ -10,7 +10,7 @@ class Address {
         this.abonentId = abonentIdCreator.incrementAndGet();
     }
 
-    public int hashCode(){
+    public int hashCode() {
         return abonentId;
     }
 }

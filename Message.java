@@ -17,5 +17,5 @@ abstract class Message {
         return to;
     }
 
-    abstract void exec(Abonent abonent);
+    abstract void exec(Abonent abonent) throws RuntimeException;
 }

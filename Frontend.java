@@ -4,7 +4,6 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -25,6 +24,7 @@ class Frontend extends AbstractHandler implements Abonent, Runnable {
     private final MessageSystem messageSystem;
 
     private static String GAME_NAME = "/test/";
+    private Address address;
     private Map<String, Integer> nameToId = new HashMap<String, Integer>();
 
     // TODO: добавить sessionId !!! Передавать его в странице и получать обратно!
@@ -59,6 +59,8 @@ class Frontend extends AbstractHandler implements Abonent, Runnable {
 
     Frontend(MessageSystem messageSystem) {
         this.messageSystem = messageSystem;
+        this.address = new Address();
+        messageSystem.addService(this);
     }
 
     private static String getTime() {
@@ -74,13 +76,11 @@ class Frontend extends AbstractHandler implements Abonent, Runnable {
 
     @Override
     public void run() {
-        try {
-            while (true) {
-                Thread.sleep(7000);
-                log.info("" + handleCount);
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        while(true){
+            messageSystem.execForAbonent(this);
+//            ThreadSleepHelper.sleep(10);
+            ThreadSleepHelper.sleep(7000);
+            log.info("" + handleCount);
         }
     }
 
@@ -134,10 +134,10 @@ class Frontend extends AbstractHandler implements Abonent, Runnable {
     }
 
     void setId(String name, Integer id) {
-        // TODO:
+        nameToId.put(name, id);
     }
 
-    Address getAddress() {
-        return null;
+    public Address getAddress() {
+        return address;
     }
 }
