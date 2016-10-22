@@ -1,7 +1,21 @@
 package com.company;
 
 abstract class Message {
-    abstract Address getTo();
+    private Address from;
+    private Address to;
 
-    abstract void exec();
+    protected Message(Address from, Address to) {
+        this.from = from;
+        this.to = to;
+    }
+
+    Address getFrom() {
+        return from;
+    }
+
+    Address getTo() {
+        return to;
+    }
+
+    abstract void exec(Abonent abonent);
 }
