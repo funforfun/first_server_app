@@ -20,6 +20,7 @@ class Frontend extends AbstractHandler implements Runnable {
     private static AtomicInteger lastUserId = new AtomicInteger(0);
     private static final int refreshTime = 3000;
     private static Logger log = Logger.getLogger("TestLogName");
+    private final MessageSystem messageSystem;
 
     // TODO: добавить sessionId !!! Передавать его в странице и получать обратно!
     private static String pagePart0 = "<html>" +
@@ -50,6 +51,10 @@ class Frontend extends AbstractHandler implements Runnable {
             "</body>" +
             "</html>";
 
+
+    Frontend(MessageSystem messageSystem){
+        this.messageSystem = messageSystem;
+    }
 
     private static String getTime() {
         Date date = new Date();
