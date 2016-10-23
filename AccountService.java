@@ -27,7 +27,8 @@ class AccountService implements Abonent, Runnable {
 
     Integer getUserId(String name) {
         ThreadSleepHelper.sleep(5000);
-        return fakeAccounter.get(name);
+        Integer user_id = fakeAccounter.get(name);
+        return (user_id == null) ? -1 : user_id;
     }
 
     MessageSystem getMessageSystem() {

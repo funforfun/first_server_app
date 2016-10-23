@@ -36,7 +36,7 @@ class Frontend extends AbstractHandler implements Abonent, Runnable {
     public void run() {
         while (true) {
             messageSystem.execForAbonent(this);
-//            ThreadSleepHelper.sleep(10);
+            ThreadSleepHelper.sleep(10);
 //            ThreadSleepHelper.sleep(7000);
 //            log.info("count requests: " + handleCount);
         }
@@ -74,10 +74,15 @@ class Frontend extends AbstractHandler implements Abonent, Runnable {
         log.info("Name from UserSession: " + userSession.getName());
         log.info("Session Id from UserSession: " + userSession.getSessionId());
         Integer id = nameToId.get(userSession.getName());
+        log.info("ID: " + id);
 
         if (id != null) {
             userSession.setUserId(id);
-            httpServletResponse.getWriter().println("<h1>User name: " + userSession.getName() + " Id:" + id + "</h1>");
+            if (id == -1) {
+                httpServletResponse.getWriter().println("<h1>User " + userSession.getName() + " is unknown!</h1>");
+            } else {
+                httpServletResponse.getWriter().println("<h1>User name: " + userSession.getName() + " Id:" + id + "</h1>");
+            }
         } else {
             httpServletResponse.getWriter().println(AuthenticationPageGenerator.getPageWaitAuthorization(userSession.getName(), session_id));
             Address addressAccountService = messageSystem.getAddressService().getAddress(AccountService.class);
