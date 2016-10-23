@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
-class FrontendImpl extends AbstractHandler implements Frontend{
+class FrontendImpl extends AbstractHandler implements Frontend, Runnable {
 
     private static AtomicInteger handleCount = new AtomicInteger(0);
     private static AtomicInteger lastUserId = new AtomicInteger(1);

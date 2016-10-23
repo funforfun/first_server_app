@@ -9,7 +9,7 @@ public class Main {
         MessageSystem messageSystem = new MessageSystem();
 
         FrontendImpl frontend = new FrontendImpl(messageSystem);
-        AccountService accountService = new AccountService(messageSystem);
+        AccountServiceImpl accountService = new AccountServiceImpl(messageSystem);
 
         (new Thread(frontend)).start();
         (new Thread(accountService)).start();
