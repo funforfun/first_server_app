@@ -11,7 +11,6 @@ public class Main {
 
         SessionHandler sessionHandler = new SessionHandler();
 
-
         Frontend frontend = new Frontend(messageSystem, sessionHandler);
         AccountService accountService = new AccountService(messageSystem);
 

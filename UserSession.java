@@ -4,14 +4,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 class UserSession {
     private static AtomicInteger currentSessionId = new AtomicInteger(1);
-    private Integer sessionId;
+    private int sessionId;
     private String name;
+    private int userId;
 
     UserSession() {
         sessionId = currentSessionId.getAndIncrement();
     }
 
-    public Integer getSessionId() {
+    public int getSessionId() {
         return sessionId;
     }
 
@@ -21,5 +22,13 @@ class UserSession {
 
     public String getName() {
         return name;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 }

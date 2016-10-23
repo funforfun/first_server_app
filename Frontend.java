@@ -40,20 +40,17 @@ class Frontend extends AbstractHandler implements Abonent, Runnable {
             messageSystem.execForAbonent(this);
 //            ThreadSleepHelper.sleep(10);
             ThreadSleepHelper.sleep(7000);
-            log.info("count requests: " + handleCount);
+//            log.info("count requests: " + handleCount);
         }
     }
 
     @Override
     public void handle(String s, Request request, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException, ServletException {
 
-        request.setSessionManager(sessionHandler.getSessionManager());
-        log.info("Session id: " + httpServletRequest.getSession(true).getId());
-        log.info("Requested Session id: " + httpServletRequest.getRequestedSessionId());
-
+        // ПОпытка сделать через сессии
 //        request.setSessionManager(sessionHandler.getSessionManager());
 //        log.info("Session id: " + request.getSession().getId());
-//        log.info("Session id: " + userSession.getId());
+
         handleCount.incrementAndGet();
         httpServletResponse.setContentType("text/html;charset=utf-8");
         httpServletResponse.setStatus(HttpServletResponse.SC_OK);
@@ -67,8 +64,9 @@ class Frontend extends AbstractHandler implements Abonent, Runnable {
 
         log.info("POST! " + handleCount);
         String name = request.getParameter("name");
-//            String session_id = request.getParameter('session_id');
+        int session_id = Integer.parseInt(request.getParameter("session_id"));
         log.info("Name from form: " + name);
+        log.info("session_id from form: " + session_id);
 
 
         Integer id = nameToId.get(name);
@@ -76,7 +74,7 @@ class Frontend extends AbstractHandler implements Abonent, Runnable {
         if (id != null) {
             httpServletResponse.getWriter().println("<h1>User name: " + name + " Id:" + id + "</h1>");
         } else {
-            httpServletResponse.getWriter().println("<h1>Wait for authorization, " + name + "</h1>");
+            httpServletResponse.getWriter().println(AuthenticationPageGenerator.getPageWaitAuthorization(name, session_id));
             Address addressAccountService = messageSystem.getAddressService().getAddress(AccountService.class);
             messageSystem.sendMessage(new MessageGetUserId(getAddress(), addressAccountService, name));
         }
