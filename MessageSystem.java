@@ -1,43 +1,11 @@
 package com.company;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+interface MessageSystem {
+    void addService(Abonent abonent);
 
-class MessageSystem {
+    void sendMessage(Message message);
 
-    private Map<Address, ConcurrentLinkedQueue<Message>> messages = new HashMap<Address, ConcurrentLinkedQueue<Message>>();
-    private AddressService addressService = new AddressService();
+    void execForAbonent(Abonent abonent);
 
-    void addService(Abonent abonent) {
-        addressService.setAddress(abonent);
-        messages.put(abonent.getAddress(), new ConcurrentLinkedQueue<Message>());
-    }
-
-    void sendMessage(Message message) {
-        Queue<Message> messageQueue = messages.get(message.getTo());
-        messageQueue.add(message);
-    }
-
-    void execForAbonent(Abonent abonent) {
-        Queue<Message> messageQueue = messages.get(abonent.getAddress());
-
-        if (messageQueue == null) {
-            return;
-        }
-
-        while (!messageQueue.isEmpty()) {
-            Message message = messageQueue.poll();
-            try {
-                message.exec(abonent);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    AddressService getAddressService(){
-        return addressService;
-    }
+    AddressService getAddressService();
 }

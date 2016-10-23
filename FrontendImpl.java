@@ -84,7 +84,8 @@ class FrontendImpl extends AbstractHandler implements Frontend, Runnable {
             }
         } else {
             httpServletResponse.getWriter().println(AuthenticationPageGenerator.getPageWaitAuthorization(userSession.getName(), session_id));
-            Address addressAccountService = messageSystem.getAddressService().getAddress(AccountService.class);
+            // TODO: AccountServiceImpl -> AccountService
+            Address addressAccountService = messageSystem.getAddressService().getAddress(AccountServiceImpl.class);
             messageSystem.sendMessage(new MessageGetUserId(getAddress(), addressAccountService, userSession.getName()));
         }
     }

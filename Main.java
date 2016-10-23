@@ -6,7 +6,7 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
 
-        MessageSystem messageSystem = new MessageSystem();
+        MessageSystemImpl messageSystem = new MessageSystemImpl();
 
         FrontendImpl frontend = new FrontendImpl(messageSystem);
         AccountServiceImpl accountService = new AccountServiceImpl(messageSystem);
