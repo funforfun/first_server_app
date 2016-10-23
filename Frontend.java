@@ -7,9 +7,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -19,42 +16,12 @@ class Frontend extends AbstractHandler implements Abonent, Runnable {
 
     private static AtomicInteger handleCount = new AtomicInteger(0);
     private static AtomicInteger lastUserId = new AtomicInteger(0);
-    private static final int refreshTime = 3000;
     private static Logger log = Logger.getLogger("TestLogName");
     private final MessageSystem messageSystem;
 
     private static String GAME_NAME = "/test/";
     private Address address;
     private Map<String, Integer> nameToId = new HashMap<String, Integer>();
-
-    // TODO: добавить sessionId !!! Передавать его в странице и получать обратно!
-    private static String pagePart0 = "<html>" +
-            "<head>" +
-            "<script type='text/JavaScript'>" +
-            "function setClientTime(){" +
-            "currentTime = new Date();" +
-            "hours = currentTime.getHours();" +
-            "minutes = currentTime.getMinutes();" +
-            "seconds = currentTime.getSeconds();" +
-            "if (minutes < 10)" +
-            "minutes = '0' + minutes;" +
-            "if (seconds < 10)" +
-            "seconds = '0' + seconds;" +
-            "timeString = hours + ':' + minutes + ':' + seconds;" +
-            "document.getElementById('ClientTime').innerHTML = timeString;" +
-            "}" +
-            "function refresh(){" +
-            "location.reload(true);" +
-            "}" +
-            "</script>" +
-            "</head>" +
-            "<body onload='setInterval(function(){refresh()}," + refreshTime + "); setClientTime();'>" +
-            "<p>Client time: <span id='ClientTime'></span></p>" +
-            "<p>Server time: ";
-
-    private static String pagePart1 = "</p>" +
-            "</body>" +
-            "</html>";
 
 
     Frontend(MessageSystem messageSystem) {
@@ -63,24 +30,14 @@ class Frontend extends AbstractHandler implements Abonent, Runnable {
         messageSystem.addService(this);
     }
 
-    private static String getTime() {
-        Date date = new Date();
-        date.getTime();
-        DateFormat formatter = new SimpleDateFormat("HH.mm.ss");
-        return formatter.format(date);
-    }
-
-    static String getPage() {
-        return pagePart0 + getTime() + pagePart1;
-    }
 
     @Override
     public void run() {
-        while(true){
+        while (true) {
             messageSystem.execForAbonent(this);
 //            ThreadSleepHelper.sleep(10);
             ThreadSleepHelper.sleep(7000);
-            log.info("" + handleCount);
+            log.info("count requests: " + handleCount);
         }
     }
 
@@ -91,8 +48,11 @@ class Frontend extends AbstractHandler implements Abonent, Runnable {
         httpServletResponse.setContentType("text/html;charset=utf-8");
         httpServletResponse.setStatus(HttpServletResponse.SC_OK);
         request.setHandled(true);
-//        httpServletResponse.getWriter().println(Frontend.getPage());
+        httpServletResponse.getWriter().println(PageGenerator.getPage());
 
+        if (true) {
+            return;
+        }
         /*
          * Вариант через форму:
          * if(request.getMethod().equals("POST")){
