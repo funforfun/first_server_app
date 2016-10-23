@@ -8,7 +8,7 @@ public class Main {
 
         MessageSystem messageSystem = new MessageSystem();
 
-        Frontend frontend = new Frontend(messageSystem, address);
+        Frontend frontend = new Frontend(messageSystem);
         AccountService accountService = new AccountService(messageSystem);
 
         (new Thread(frontend)).start();
