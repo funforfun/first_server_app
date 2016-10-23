@@ -2,6 +2,7 @@ package com.company;
 
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.server.session.SessionHandler;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -15,17 +16,19 @@ import java.util.logging.Logger;
 class Frontend extends AbstractHandler implements Abonent, Runnable {
 
     private static AtomicInteger handleCount = new AtomicInteger(0);
-    private static AtomicInteger lastUserId = new AtomicInteger(0);
+    private static AtomicInteger lastUserId = new AtomicInteger(1);
     private static Logger log = Logger.getLogger("TestLogName");
     private final MessageSystem messageSystem;
+    private SessionHandler sessionHandler;
 
-    private static String GAME_NAME = "/test/";
     private Address address;
     private Map<String, Integer> nameToId = new HashMap<String, Integer>();
+    private Map<Integer, UserSession> sessionIdToSession = new HashMap<Integer, UserSession>();
 
 
-    Frontend(MessageSystem messageSystem) {
+    Frontend(MessageSystem messageSystem, SessionHandler sessionHandler) {
         this.messageSystem = messageSystem;
+        this.sessionHandler = sessionHandler;
         this.address = new Address();
         messageSystem.addService(this);
     }
@@ -44,33 +47,36 @@ class Frontend extends AbstractHandler implements Abonent, Runnable {
     @Override
     public void handle(String s, Request request, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException, ServletException {
 
+        request.setSessionManager(sessionHandler.getSessionManager());
+        log.info("Session id: " + httpServletRequest.getSession(true).getId());
+        log.info("Requested Session id: " + httpServletRequest.getRequestedSessionId());
+
+//        request.setSessionManager(sessionHandler.getSessionManager());
+//        log.info("Session id: " + request.getSession().getId());
+//        log.info("Session id: " + userSession.getId());
         handleCount.incrementAndGet();
         httpServletResponse.setContentType("text/html;charset=utf-8");
         httpServletResponse.setStatus(HttpServletResponse.SC_OK);
         request.setHandled(true);
-        httpServletResponse.getWriter().println(PageGenerator.getPage());
 
-        if (true) {
-            return;
-        }
-        /*
-         * Вариант через форму:
-         * if(request.getMethod().equals("POST")){
-         *  request.getParameter('session_id');
-         * }
-         */
-
-        if (!s.equals(GAME_NAME)) {
+        if (!request.getMethod().equals("POST")) {
+            httpServletResponse.getWriter().println(AuthenticationPageGenerator.getPageWithSessionId(lastUserId.getAndIncrement()));
+            log.info(request.getMethod() + " " + handleCount);
             return;
         }
 
-        String name = "Tully";
+        log.info("POST! " + handleCount);
+        String name = request.getParameter("name");
+//            String session_id = request.getParameter('session_id');
+        log.info("Name from form: " + name);
+
+
         Integer id = nameToId.get(name);
 
         if (id != null) {
             httpServletResponse.getWriter().println("<h1>User name: " + name + " Id:" + id + "</h1>");
         } else {
-            httpServletResponse.getWriter().println("<h1>Wait for authorization</h1>");
+            httpServletResponse.getWriter().println("<h1>Wait for authorization, " + name + "</h1>");
             Address addressAccountService = messageSystem.getAddressService().getAddress(AccountService.class);
             messageSystem.sendMessage(new MessageGetUserId(getAddress(), addressAccountService, name));
         }
