@@ -19,16 +19,14 @@ class Frontend extends AbstractHandler implements Abonent, Runnable {
     private static AtomicInteger lastUserId = new AtomicInteger(1);
     private static Logger log = Logger.getLogger("TestLogName");
     private final MessageSystem messageSystem;
-    private SessionHandler sessionHandler;
 
     private Address address;
     private Map<String, Integer> nameToId = new HashMap<String, Integer>();
     private Map<Integer, UserSession> sessionIdToSession = new HashMap<Integer, UserSession>();
 
 
-    Frontend(MessageSystem messageSystem, SessionHandler sessionHandler) {
+    Frontend(MessageSystem messageSystem) {
         this.messageSystem = messageSystem;
-        this.sessionHandler = sessionHandler;
         this.address = new Address();
         messageSystem.addService(this);
     }
@@ -39,17 +37,18 @@ class Frontend extends AbstractHandler implements Abonent, Runnable {
         while (true) {
             messageSystem.execForAbonent(this);
 //            ThreadSleepHelper.sleep(10);
-            ThreadSleepHelper.sleep(7000);
+//            ThreadSleepHelper.sleep(7000);
 //            log.info("count requests: " + handleCount);
         }
     }
 
     @Override
-    public void handle(String s, Request request, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException, ServletException {
-
-        // Попытка сделать через сессии (неудачно)
-//        request.setSessionManager(sessionHandler.getSessionManager());
-//        log.info("Session id: " + request.getSession().getId());
+    public void handle(
+            String s,
+            Request request,
+            HttpServletRequest httpServletRequest,
+            HttpServletResponse httpServletResponse
+    ) throws IOException, ServletException {
 
         handleCount.incrementAndGet();
         httpServletResponse.setContentType("text/html;charset=utf-8");
@@ -84,23 +83,6 @@ class Frontend extends AbstractHandler implements Abonent, Runnable {
             Address addressAccountService = messageSystem.getAddressService().getAddress(AccountService.class);
             messageSystem.sendMessage(new MessageGetUserId(getAddress(), addressAccountService, userSession.getName()));
         }
-
-
-//        // TODO: через куки!
-//        Cookie[] cookies = httpServletRequest.getCookies();
-//
-//        if (cookies.length == 0) {
-//            Cookie oreo = new Cookie("session_id", "" + lastUserId.getAndIncrement());
-//            httpServletResponse.addCookie(oreo);
-//            log.info("НОВЫЙ КУК:" + oreo.getValue());
-//        } else {
-//            log.info("cookies.length:" + cookies.length);
-//            for (Cookie el : cookies) {
-//                if (el.getName().equals("session_id")) {
-//                    log.info("el.getValue():" + el.getValue());
-//                }
-//            }
-//        }
     }
 
     void setId(String name, Integer id) {
@@ -108,7 +90,6 @@ class Frontend extends AbstractHandler implements Abonent, Runnable {
     }
 
     private UserSession getUserSession(int session_id, String name) {
-
         if (sessionIdToSession.containsKey(session_id)) {
             return sessionIdToSession.get(session_id);
         }

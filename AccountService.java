@@ -26,7 +26,7 @@ class AccountService implements Abonent, Runnable {
     }
 
     Integer getUserId(String name) {
-        ThreadSleepHelper.sleep(500);
+        ThreadSleepHelper.sleep(5000);
         return fakeAccounter.get(name);
     }
 
