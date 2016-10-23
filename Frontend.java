@@ -47,7 +47,7 @@ class Frontend extends AbstractHandler implements Abonent, Runnable {
     @Override
     public void handle(String s, Request request, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException, ServletException {
 
-        // ПОпытка сделать через сессии
+        // Попытка сделать через сессии (неудачно)
 //        request.setSessionManager(sessionHandler.getSessionManager());
 //        log.info("Session id: " + request.getSession().getId());
 
@@ -58,25 +58,31 @@ class Frontend extends AbstractHandler implements Abonent, Runnable {
 
         if (!request.getMethod().equals("POST")) {
             httpServletResponse.getWriter().println(AuthenticationPageGenerator.getPageWithSessionId(lastUserId.getAndIncrement()));
-            log.info(request.getMethod() + " " + handleCount);
+            log.info(request.getMethod() + "! " + handleCount);
             return;
         }
 
         log.info("POST! " + handleCount);
         String name = request.getParameter("name");
         int session_id = Integer.parseInt(request.getParameter("session_id"));
+
+
+        UserSession userSession = getUserSession(session_id, name);
+
+        log.info("************************************************");
         log.info("Name from form: " + name);
-        log.info("session_id from form: " + session_id);
-
-
-        Integer id = nameToId.get(name);
+        log.info("Session Id from form: " + session_id);
+        log.info("Name from UserSession: " + userSession.getName());
+        log.info("Session Id from UserSession: " + userSession.getSessionId());
+        Integer id = nameToId.get(userSession.getName());
 
         if (id != null) {
-            httpServletResponse.getWriter().println("<h1>User name: " + name + " Id:" + id + "</h1>");
+            userSession.setUserId(id);
+            httpServletResponse.getWriter().println("<h1>User name: " + userSession.getName() + " Id:" + id + "</h1>");
         } else {
-            httpServletResponse.getWriter().println(AuthenticationPageGenerator.getPageWaitAuthorization(name, session_id));
+            httpServletResponse.getWriter().println(AuthenticationPageGenerator.getPageWaitAuthorization(userSession.getName(), session_id));
             Address addressAccountService = messageSystem.getAddressService().getAddress(AccountService.class);
-            messageSystem.sendMessage(new MessageGetUserId(getAddress(), addressAccountService, name));
+            messageSystem.sendMessage(new MessageGetUserId(getAddress(), addressAccountService, userSession.getName()));
         }
 
 
@@ -99,6 +105,18 @@ class Frontend extends AbstractHandler implements Abonent, Runnable {
 
     void setId(String name, Integer id) {
         nameToId.put(name, id);
+    }
+
+    private UserSession getUserSession(int session_id, String name) {
+
+        if (sessionIdToSession.containsKey(session_id)) {
+            return sessionIdToSession.get(session_id);
+        }
+
+        UserSession userSession = new UserSession();
+        userSession.setName(name);
+        sessionIdToSession.put(session_id, userSession);
+        return userSession;
     }
 
     public Address getAddress() {
